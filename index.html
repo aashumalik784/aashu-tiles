@@ -223,9 +223,10 @@
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } 
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        // Firebase Config यहाँ वापस सेट कर दी है ताकि प्रॉम्प्ट न आए।
+        // क्लाउडफ्लेयर एन्वायरनमेंट वैरिएबल्स सेटअप सपोर्ट।
+        // अगर प्रोडक्शन एन्वायरमेंट से चाबी नहीं मिलेगी, तो यह डिफ़ॉल्ट रूप से इस स्ट्रिंग को पढ़ेगा।
         const firebaseConfig = {
-          apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
+          apiKey: (typeof process !== 'undefined' && process.env?.FIREBASE_API_KEY) || "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
           storageBucket: "aashu-tiles.firebasestorage.app",
@@ -338,8 +339,7 @@
 
         window.adminLogin = function() {
             const pass = document.getElementById('adminPass').value;
-            // पासवर्ड को रिवर्स स्ट्रिंग (btoa/atob) फॉर्म में सुरक्षित किया गया है ताकि सोर्स कोड में सीधा न दिखे।
-            // आपका पासवर्ड 'aashu@2026' ही रहेगा।
+            // पासवर्ड 'aashu@2026' को कोड सुरक्षा के लिए एन्कोड किया गया है।
             if (btoa(pass) === "YWFzaHVAMjAyNg==") {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
