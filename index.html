@@ -43,7 +43,7 @@
         .logo span { color: var(--accent-color); }
         nav a { color: var(--text-muted); text-decoration: none; margin-left: 30px; font-weight: 500; }
         nav a:hover { color: var(--accent-color); }
-        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+        .hamburger { display: flex; flex-direction: column; cursor: pointer; gap: 5px; }
         .hamburger span { width: 25px; height: 3px; background: var(--text-main); border-radius: 2px; }
         .mobile-nav { display: none; position: absolute; top: 70px; left: 0; width: 100%;
                       background: #0b111e; flex-direction: column; padding: 20px 8%; }
@@ -133,7 +133,6 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.3rem; }
             nav { display: none; }
-            .hamburger { display: flex; }
         }
     </style>
 </head>
@@ -141,20 +140,20 @@
 
     <header>
         <div class="logo">Aashu<span>Tiles.</span></div>
-        <nav>
+        <nav id="mainNav">
             <a href="#home">Home</a>
             <a href="#services">Services</a>
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact</a>
         </nav>
-        <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span>
+        <div class="hamburger" id="hamburgerMenu">
+            <span></span><span></span><span></span>
         </div>
         <div class="mobile-nav" id="mobileNav">
-            <a href="#home" onclick="toggleMenu()">Home</a>
-            <a href="#services" onclick="toggleMenu()">Services</a>
-            <a href="#gallery" onclick="toggleMenu()">Gallery</a>
-            <a href="#contact" onclick="toggleMenu()">Contact</a>
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#services" class="nav-link">Services</a>
+            <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#contact" class="nav-link">Contact</a>
         </div>
     </header>
 
@@ -205,7 +204,7 @@
                 <option value="pillar">Pillar Design</option>
             </select>
 
-            <button class="upload-btn" id="uploadBtn" onclick="uploadPhotos()">Gallery Me Add Karein</button>
+            <button class="upload-btn" id="uploadBtn">Gallery Me Add Karein</button>
             <div id="progressBar"><div id="progressFill"></div></div>
             <div id="uploadStatus"></div>
         </div>
@@ -215,15 +214,15 @@
         <h2>Hamari <span>Photo Gallery</span></h2>
         <p class="sub-title">Kam ke mutabik sahi gallery dekhne ke liye button dabayein</p>
         
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="filterGallery('all', this)">All Work</button>
-            <button class="filter-btn" onclick="filterGallery('stone', this)">Stone</button>
-            <button class="filter-btn" onclick="filterGallery('floor', this)">Floor Tiles</button>
-            <button class="filter-btn" onclick="filterGallery('wall', this)">Wall Tiles</button>
-            <button class="filter-btn" onclick="filterGallery('stairs', this)">Step Rizer (सीढ़ियां)</button>
-            <button class="filter-btn" onclick="filterGallery('kitchen', this)">Modular Kitchen</button>
-            <button class="filter-btn" onclick="filterGallery('ramp', this)">Ramp</button>
-            <button class="filter-btn" onclick="filterGallery('pillar', this)">Pillar</button>
+        <div class="filter-container" id="filterContainer">
+            <button class="filter-btn active" data-filter="all">All Work</button>
+            <button class="filter-btn" data-filter="stone">Stone</button>
+            <button class="filter-btn" data-filter="floor">Floor Tiles</button>
+            <button class="filter-btn" data-filter="wall">Wall Tiles</button>
+            <button class="filter-btn" data-filter="stairs">Step Rizer (सीढ़ियां)</button>
+            <button class="filter-btn" data-filter="kitchen">Modular Kitchen</button>
+            <button class="filter-btn" data-filter="ramp">Ramp</button>
+            <button class="filter-btn" data-filter="pillar">Pillar</button>
         </div>
 
         <div class="loader" id="loader">Loading photos...</div>
@@ -234,7 +233,7 @@
         <h3>🔒 Admin Panel</h3>
         <div class="admin-login" id="adminLogin">
             <input type="password" id="adminPass" placeholder="Admin Password">
-            <button onclick="adminLogin()">Login</button>
+            <button id="adminLoginBtn">Login</button>
         </div>
         <div class="admin-status" id="adminStatus"></div>
     </section>
@@ -258,10 +257,12 @@
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } 
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+        // डेटाबेस यूआरएल (databaseURL) को यहाँ बिल्कुल सही लिंक के साथ फिक्स कर दिया गया है
         const firebaseConfig = {
           apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
+          databaseURL: "https://aashu-tiles-default-rtdb.firebaseio.com",
           measurementId: "G-WQ0CTGJ9HZ"
         };
 
@@ -292,6 +293,20 @@
         const uploadStatus = document.getElementById('uploadStatus');
         const loader = document.getElementById('loader');
         const categorySelect = document.getElementById('categorySelect');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const mobileNav = document.getElementById('mobileNav');
+
+        // मोबाइल मेन्यू क्लिक्स फिक्स
+        hamburgerMenu.addEventListener('click', () => {
+            mobileNav.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+            });
+        });
 
         photoInput.addEventListener('change', function() {
             if (this.files.length > 0) {
@@ -299,7 +314,8 @@
             }
         });
 
-        window.uploadPhotos = async function() {
+        // फोटो अपलोड लॉजिक
+        uploadBtn.addEventListener('click', async function() {
             const files = photoInput.files;
             const selectedCategory = categorySelect.value;
 
@@ -367,21 +383,9 @@
                 uploadStatus.style.color = 'var(--success)';
             }, 500);
             setTimeout(() => uploadStatus.textContent = '', 4000);
-        }
+        });
 
+        // लाइव डेटा फेचिंग और रेंडरिंग
         onSnapshot(collection(db, "gallery"), (snapshot) => {
             loader.style.display = 'none';
-            galleryGrid.innerHTML = '';
-            if (snapshot.empty) {
-                galleryGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">Abhi koi photo nahi hai. Pehli photo upload karo!</p>';
-                return;
-            }
-            const docs = snapshot.docs.sort((a, b) => {
-                const timeA = a.data().timestamp?.seconds || 0;
-                const timeB = b.data().timestamp?.seconds || 0;
-                return timeB - timeA;
-            });
-            
-            docs.forEach((docSnap) => {
-                const data = docSnap.data();
-                
+     
