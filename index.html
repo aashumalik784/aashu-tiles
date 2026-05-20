@@ -168,4 +168,217 @@
                 <h3>Marble & Granite Work</h3>
                 <p>Kitchen counter-tops, seedhiyon ki moulding, mandir designs, aur premium marble ki ghasai aur polishing.</p>
             </div>
-            <div class="card
+            <div class="card">
+                <div class="card-icon">🏡</div>
+                <h3>Elevation & Cladding</h3>
+                <p>Ghar ke front look ko behtareen banane ke liye stylish stone cladding aur wall tiles ka kaam.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="upload-section">
+        <h2>Photo <span>Upload Karein</span></h2>
+        <p class="sub-title">Apne kaam ki photo gallery me add karein. Sab visitors ko dikhegi</p>
+        <div class="upload-box">
+            <input type="file" id="photoInput" accept="image/*" multiple>
+            <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
+            <div id="fileName" style="margin-top: 15px; color: var(--text-muted);"></div>
+            <button class="upload-btn" id="uploadBtn" onclick="uploadPhotos()">Gallery Me Add Karein</button>
+            <div id="progressBar"><div id="progressFill"></div></div>
+            <div id="uploadStatus"></div>
+        </div>
+    </section>
+
+    <section class="gallery" id="gallery">
+        <h2>Hamari <span>Photo Gallery</span></h2>
+        <p class="sub-title">Real projects - Live uploaded by users</p>
+        <div class="loader" id="loader">Loading photos...</div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <section class="admin-section">
+        <h3>🔒 Admin Panel</h3>
+        <div class="admin-login" id="adminLogin">
+            <input type="password" id="adminPass" placeholder="Admin Password">
+            <button onclick="adminLogin()">Login</button>
+        </div>
+        <div class="admin-status" id="adminStatus"></div>
+    </section>
+
+    <div class="sticky-cta">
+        <a href="tel:+919627535352" class="call">📞</a>
+        <a href="https://wa.me/919627535352" class="wa" target="_blank">💬</a>
+    </div>
+
+    <footer id="contact">
+        <div class="contact-info">
+            <p>📍 Location: <span>Shamli, Uttar Pradesh - 247776</span></p>
+            <p>📞 Phone/WhatsApp: <span>+91 9627535352</span></p>
+            <p>✉️ Email: <span>aashumalik784@gmail.com</span></p>
+        </div>
+        <p>&copy; 2026 Aashu Tiles & Stones Work. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } 
+                from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } 
+                from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        // Tumhara Firebase Config - Already Added
+        const firebaseConfig = {
+          apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
+          authDomain: "aashu-tiles.firebaseapp.com",
+          projectId: "aashu-tiles",
+          storageBucket: "aashu-tiles.firebasestorage.app",
+          messagingSenderId: "140809525543",
+          appId: "1:140809525543:web:d4f980a4bbbff57c28b102",
+          measurementId: "G-WQ0CTGJ9HZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        // Admin Password - Isko change kar dena
+        const ADMIN_PASSWORD = "aashu@2026";
+        let isAdmin = false;
+
+        const photoInput = document.getElementById('photoInput');
+        const fileNameDiv = document.getElementById('fileName');
+        const galleryGrid = document.getElementById('galleryGrid');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const loader = document.getElementById('loader');
+
+        photoInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileNameDiv.textContent = `${this.files.length} photo selected`;
+            }
+        });
+
+        // Upload Photos
+        window.uploadPhotos = async function() {
+            const files = photoInput.files;
+            if (files.length === 0) {
+                alert('Pehle photo choose karo');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            progressBar.style.display = 'block';
+            uploadStatus.textContent = 'Uploading...';
+            uploadStatus.style.color = 'var(--accent-color)';
+
+            let uploadedCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileName = `${Date.now()}_${file.name}`;
+                const storageRef = ref(storage, `gallery/${fileName}`);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+
+                await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            progressFill.style.width = progress + '%';
+                        },
+                        (error) => { 
+                            uploadStatus.textContent = 'Upload failed: ' + error.message;
+                            uploadStatus.style.color = 'var(--danger)';
+                            reject(error); 
+                        },
+                        async () => {
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            await addDoc(collection(db, "gallery"), {
+                                url: downloadURL,
+                                name: file.name,
+                                fileName: fileName,
+                                timestamp: serverTimestamp()
+                            });
+                            uploadedCount++;
+                            resolve();
+                        }
+                    );
+                });
+            }
+
+            photoInput.value = '';
+            fileNameDiv.textContent = '';
+            uploadBtn.disabled = false;
+            progressBar.style.display = 'none';
+            progressFill.style.width = '0%';
+            uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
+            uploadStatus.style.color = 'var(--success)';
+            setTimeout(() => uploadStatus.textContent = '', 3000);
+        }
+
+        // Real-time Gallery Load
+        onSnapshot(collection(db, "gallery"), (snapshot) => {
+            loader.style.display = 'none';
+            galleryGrid.innerHTML = '';
+            if (snapshot.empty) {
+                galleryGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">Abhi koi photo nahi hai. Pehli photo upload karo!</p>';
+                return;
+            }
+            snapshot.docs.sort((a, b) => b.data().timestamp?.seconds - a.data().timestamp?.seconds);
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                addPhotoToGallery(data.url, data.name, docSnap.id, data.fileName);
+            });
+        });
+
+        function addPhotoToGallery(url, name, docId, fileName) {
+            const photoBox = document.createElement('div');
+            photoBox.className = 'photo-box';
+            photoBox.innerHTML = `
+                <img src="${url}" alt="${name}" loading="lazy">
+                <button class="delete-btn" onclick="deletePhoto('${docId}', '${fileName}')">×</button>
+                <div class="photo-caption">${name.substring(0, 25)}</div>
+            `;
+            galleryGrid.appendChild(photoBox);
+        }
+
+        // Admin Login
+        window.adminLogin = function() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.body.classList.add('admin-mode');
+                document.getElementById('adminStatus').textContent = '✅ Admin Mode Active - Delete button dikh raha hai';
+                document.getElementById('adminLogin').style.display = 'none';
+            } else {
+                alert('Galat password');
+            }
+        }
+
+        // Delete Photo - Admin Only
+        window.deletePhoto = async function(docId, fileName) {
+            if (!isAdmin) {
+                alert('Admin login required');
+                return;
+            }
+            if (confirm('Photo delete karni hai?')) {
+                try {
+                    await deleteDoc(doc(db, "gallery", docId));
+                    const storageRef = ref(storage, `gallery/${fileName}`);
+                    await deleteObject(storageRef);
+                } catch (error) {
+                    alert('Delete failed: ' + error.message);
+                }
+            }
+        }
+
+        // Menu Toggle
+        window.toggleMenu = function() {
+            document.getElementById('mobileNav').classList.toggle('active');
+        }
+    </script>
+
+</body>
+    </html>
