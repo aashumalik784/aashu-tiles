@@ -170,39 +170,37 @@
 
         /* Gallery Section */
         .gallery {
-            padding: 60px 8%;
+            padding: 80px 8%;
             text-align: center;
             background-color: rgba(21, 31, 50, 0.3);
         }
 
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 30px;
         }
 
         .photo-box {
             background-color: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.05);
             aspect-ratio: 4/3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .photo-box:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
         }
 
         .photo-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
 
         /* Footer / Contact Details */
@@ -279,16 +277,16 @@
         <p class="sub-title">Hamare haath se kiye gaye asli kaam ki jhalak</p>
         <div class="gallery-grid">
             <div class="photo-box">
-                [Photo 1 Upload Karein]
+                <img src="work1.jpg" alt="Tiles Fitting Work Aashu Tiles">
             </div>
             <div class="photo-box">
-                [Photo 2 Upload Karein]
+                <img src="work2.jpg" alt="Marble Floor Polishing">
             </div>
             <div class="photo-box">
-                [Photo 3 Upload Karein]
+                <img src="work3.jpg" alt="Granite Kitchen Countertop">
             </div>
             <div class="photo-box">
-                [Photo 4 Upload Karein]
+                <img src="work4.jpg" alt="Front Wall Stone Cladding">
             </div>
         </div>
     </section>
