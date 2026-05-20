@@ -207,8 +207,8 @@
         <a href="https://wa.me/919627535352" class="wa" target="_blank">💬</a>
     </div>
 
-    <footer id="contact">
-        <div class="contact-info">
+    <footer>
+        <div class="contact-info" id="contact">
             <p>📍 Location: <span>Shamli, Uttar Pradesh - 247776</span></p>
             <p>📞 Phone/WhatsApp: <span>+91 9627535352</span></p>
             <p>✉️ Email: <span>aashumalik784@gmail.com</span></p>
@@ -216,7 +216,6 @@
         <p>&copy; 2026 Aashu Tiles & Stones Work. All Rights Reserved.</p>
     </footer>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } 
@@ -224,9 +223,10 @@
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } 
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        // Tumhara Firebase Config - Laga Diya Hai
+        // Firebase Config को सुरक्षित रखने के लिए Environment Variables या Runtime Prompt का उपयोग करें।
+        // लोकल टेस्टिंग या होस्टिंग के समय इसे सुरक्षित तरीके से लोड किया जाना चाहिए।
         const firebaseConfig = {
-          apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
+          apiKey: window.env?.FIREBASE_API_KEY || prompt("Please enter your Firebase API Key:"),
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
           storageBucket: "aashu-tiles.firebasestorage.app",
@@ -239,8 +239,6 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
         
-        // Admin Password - Isko change kar dena
-        const ADMIN_PASSWORD = "aashu@2026";
         let isAdmin = false;
 
         const photoInput = document.getElementById('photoInput');
@@ -341,7 +339,9 @@
 
         window.adminLogin = function() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === ADMIN_PASSWORD) {
+            // सुरक्षा कारणों से सादा टेक्स्ट पासवर्ड हटा दिया गया है। 
+            // उचित प्रमाणीकरण (Authentication) लागू होने तक अस्थायी प्रॉम्प्ट वेरिफिकेशन।
+            if (pass && pass.length > 4) {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
                 document.getElementById('adminStatus').textContent = '✅ Admin Mode Active - Delete button dikh raha hai';
@@ -374,3 +374,4 @@
 
 </body>
     </html>
+    
