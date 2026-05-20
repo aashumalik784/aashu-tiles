@@ -99,7 +99,6 @@
                         gap: 25px; margin-top: 30px; }
        .photo-box { background-color: var(--card-bg); border-radius: 12px; overflow: hidden;
                      position: relative; aspect-ratio: 4/3; transition: 0.4s; }
-       .photo-box.hide { transform: scale(0); opacity: 0; display: none; }
        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
        .photo-tag { position: absolute; top: 10px; left: 10px; background: rgba(11, 17, 30, 0.85);
                      color: var(--accent-color); padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600; }
@@ -107,7 +106,7 @@
        .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger);
                       color: white; border: none; width: 30px; height: 30px; border-radius: 50%;
                       cursor: pointer; font-size: 16px; display: none; z-index: 10; }
-       .admin-mode.delete-btn { display: block; }
+       .admin-mode .delete-btn { display: block; }
 
        .admin-section { background: rgba(239, 68, 68, 0.1); padding: 40px 8%; text-align: center; }
        .admin-login input { padding: 10px 20px; border-radius: 20px; border: 1px solid var(--text-muted);
@@ -257,25 +256,14 @@
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy }
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase config Cloudflare se load kar
-        const configRes = await fetch('/api/config');
-        const firebaseConfig = await configRes.json();
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
+        let app, db;
         let isAdmin = false;
         let currentFilter = 'all';
         let allPhotos = [];
 
         const categoryNames = {
-            stone: "Stone Work",
-            floor: "Floor Tiles",
-            wall: "Wall Tiles",
-            stairs: "Step Rizer",
-            kitchen: "Modular Kitchen",
-            ramp: "Ramp",
-            pillar: "Pillar"
+            stone: "Stone Work", floor: "Floor Tiles", wall: "Wall Tiles", stairs: "Step Rizer",
+            kitchen: "Modular Kitchen", ramp: "Ramp", pillar: "Pillar"
         };
 
         const photoInput = document.getElementById('photoInput');
@@ -291,41 +279,57 @@
         const hamburgerMenu = document.getElementById('hamburgerMenu');
         const mobileNav = document.getElementById('mobileNav');
         const adminStatus = document.getElementById('adminStatus');
+        const adminPass = document.getElementById('adminPass');
 
-        hamburgerMenu.addEventListener('click', () => {
-            mobileNav.classList.toggle('active');
-        });
+        // Firebase Init
+        try {
+            const configRes = await fetch('/api/config');
+            const firebaseConfig = await configRes.json();
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            loadGallery();
+        } catch (err) {
+            loader.textContent = 'Firebase connect nahi hua. /api/config check karo.';
+            console.error(err);
+        }
 
+        // Mobile Menu
+        hamburgerMenu.addEventListener('click', () => mobileNav.classList.toggle('active'));
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileNav.classList.remove('active');
-            });
+            link.addEventListener('click', () => mobileNav.classList.remove('active'));
         });
 
-        photoInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileNameDiv.textContent = `${this.files.length} photo selected`;
+        // Admin Login
+        adminLoginBtn.addEventListener('click', () => {
+            if (adminPass.value === 'aashu123') {
+                isAdmin = true;
+                adminStatus.textContent = '✅ Admin Mode ON';
+                adminStatus.style.color = 'var(--success)';
+                document.getElementById('adminLogin').style.display = 'none';
+                document.body.classList.add('admin-mode');
+                renderGallery(allPhotos);
+            } else {
+                adminStatus.textContent = '❌ Galat Password';
+                adminStatus.style.color = 'var(--danger)';
             }
         });
 
+        // Photo Select
+        photoInput.addEventListener('change', function() {
+            if (this.files.length > 0) fileNameDiv.textContent = `${this.files.length} photo selected`;
+        });
+
+        // Upload Logic
         uploadBtn.addEventListener('click', async function() {
             const files = photoInput.files;
             const selectedCategory = categorySelect.value;
-
-            if (files.length === 0) {
-                alert('Pehle photo choose karo');
-                return;
-            }
-            if (!selectedCategory) {
-                alert('Kripya photo ki sahi Category chunein!');
-                return;
-            }
+            if (files.length === 0) return alert('Pehle photo choose karo');
+            if (!selectedCategory) return alert('Kripya Category chunein!');
 
             uploadBtn.disabled = true;
             progressBar.style.display = 'block';
             uploadStatus.textContent = 'Uploading...';
             uploadStatus.style.color = 'var(--accent-color)';
-
             let uploadedCount = 0;
 
             for (let i = 0; i < files.length; i++) {
@@ -335,28 +339,16 @@
                 progressFill.style.width = `${((i + 0.5) / files.length) * 100}%`;
 
                 try {
-                    const response = await fetch('/api/upload', {
-                        method: "POST",
-                        body: formData
-                    });
-
+                    const response = await fetch('/api/upload', { method: "POST", body: formData });
                     const result = await response.json();
-
                     if (result.success) {
                         await addDoc(collection(db, "gallery"), {
-                            url: result.data.url,
-                            name: file.name,
-                            category: selectedCategory,
-                            deleteUrl: result.data.delete_url,
-                            timestamp: serverTimestamp()
+                            url: result.data.url, name: file.name, category: selectedCategory,
+                            deleteUrl: result.data.delete_url, timestamp: serverTimestamp()
                         });
                         uploadedCount++;
-                    } else {
-                        console.error('Upload Error:', result);
-                        throw new Error(result.error?.message || 'Upload failed');
-                    }
+                    } else { throw new Error(result.error?.message || 'Upload failed'); }
                 } catch (error) {
-                    console.error('Upload Error:', error);
                     uploadStatus.textContent = 'Upload failed: ' + error.message;
                     uploadStatus.style.color = 'var(--danger)';
                     uploadBtn.disabled = false;
@@ -364,31 +356,21 @@
                     return;
                 }
             }
-
             progressFill.style.width = '100%';
-            photoInput.value = '';
-            fileNameDiv.textContent = '';
-            categorySelect.value = '';
+            photoInput.value = ''; fileNameDiv.textContent = ''; categorySelect.value = '';
             uploadBtn.disabled = false;
             setTimeout(() => {
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-                uploadStatus.textContent = `✅ ${uploadedCount} photo (${categoryNames[selectedCategory]}) me upload ho gayi!`;
+                progressBar.style.display = 'none'; progressFill.style.width = '0%';
+                uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
                 uploadStatus.style.color = 'var(--success)';
             }, 500);
             setTimeout(() => uploadStatus.textContent = '', 4000);
         });
 
-        function renderGallery(photos) {
-            galleryGrid.innerHTML = '';
-
-            const filteredPhotos = currentFilter === 'all'
-               ? photos
-                : photos.filter(photo => photo.category === currentFilter);
-
-            if (filteredPhotos.length === 0) {
-                galleryGrid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Is category me abhi koi photo nahi hai</p>';
-                return;
-            }
-
-            filteredPhotos.forEach(photo 
+        // Gallery Load
+        function loadGallery() {
+            const q = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                loader.style.display = 'none';
+                allPhotos = [];
+                snapshot.forEa
