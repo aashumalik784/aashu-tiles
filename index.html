@@ -90,7 +90,6 @@
         #progressFill { height: 100%; background: var(--accent-color); width: 0%; transition: 0.3s; }
         #uploadStatus { margin-top: 15px; font-weight: 600; }
         
-        /* Filter Container Styles */
         .filter-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
         .filter-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05);
                       padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: 0.3s; }
@@ -110,13 +109,12 @@
                       cursor: pointer; font-size: 16px; display: none; z-index: 10; }
         .admin-mode .delete-btn { display: block; }
         
-        /* 9:16 Fullscreen Modal CSS */
+        /* 9:16 Fullscreen Lightbox CSS */
         .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
                           background: rgba(5, 8, 15, 0.95); z-index: 2000; justify-content: center; align-items: center; }
-        .lightbox-content { position: relative; width: 90%; max-width: 450px; height: 85vh; display: flex; justify-content: center; align-items: center; }
+        .lightbox-content { position: relative; width: 92%; max-width: 420px; height: 85vh; display: flex; justify-content: center; align-items: center; }
         .lightbox-content img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
-        .lightbox-close { position: fixed; top: 20px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer; z-index: 2100; }
-        .lightbox-close:hover { color: var(--accent-color); }
+        .lightbox-close { position: fixed; top: 20px; right: 25px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2100; }
 
         .admin-section { background: rgba(239, 68, 68, 0.1); padding: 40px 8%; text-align: center; }
         .admin-login input { padding: 10px 20px; border-radius: 20px; border: 1px solid var(--text-muted);
@@ -156,14 +154,14 @@
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact</a>
         </nav>
-        <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span>
+        <div class="hamburger" id="menuToggleBtn">
+            <span></span><span></span><span></span>
         </div>
         <div class="mobile-nav" id="mobileNav">
-            <a href="#home" onclick="toggleMenu()">Home</a>
-            <a href="#services" onclick="toggleMenu()">Services</a>
-            <a href="#gallery" onclick="toggleMenu()">Gallery</a>
-            <a href="#contact" onclick="toggleMenu()">Contact</a>
+            <a href="#home" class="mob-link">Home</a>
+            <a href="#services" class="mob-link">Services</a>
+            <a href="#gallery" class="mob-link">Gallery</a>
+            <a href="#contact" class="mob-link">Contact</a>
         </div>
     </header>
 
@@ -201,7 +199,7 @@
         <div class="upload-box">
             <input type="file" id="photoInput" accept="image/*" multiple>
             <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
-            <div id="fileName" style="margin-top: 15px; color: var(--text-muted);"></div>
+            <div id="fileName" style="margin-bottom: 15px; color: var(--text-muted);"></div>
             
             <select id="categorySelect" class="select-style">
                 <option value="" disabled selected>--- Category Chunein ---</option>
@@ -214,7 +212,7 @@
                 <option value="pillar">Pillar Design</option>
             </select>
 
-            <button class="upload-btn" id="uploadBtn" onclick="uploadPhotos()">Gallery Me Add Karein</button>
+            <button class="upload-btn" id="uploadBtn">Gallery Me Add Karein</button>
             <div id="progressBar"><div id="progressFill"></div></div>
             <div id="uploadStatus"></div>
         </div>
@@ -224,23 +222,23 @@
         <h2>Hamari <span>Photo Gallery</span></h2>
         <p class="sub-title">Kam ke mutabik sahi gallery dekhne ke liye button dabayein</p>
         
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="filterGallery('all', this)">All Work</button>
-            <button class="filter-btn" onclick="filterGallery('stone', this)">Stone</button>
-            <button class="filter-btn" onclick="filterGallery('floor', this)">Floor Tiles</button>
-            <button class="filter-btn" onclick="filterGallery('wall', this)">Wall Tiles</button>
-            <button class="filter-btn" onclick="filterGallery('stairs', this)">Step Rizer (सीढ़ियां)</button>
-            <button class="filter-btn" onclick="filterGallery('kitchen', this)">Modular Kitchen</button>
-            <button class="filter-btn" onclick="filterGallery('ramp', this)">Ramp</button>
-            <button class="filter-btn" onclick="filterGallery('pillar', this)">Pillar</button>
+        <div class="filter-container" id="filterBtnGroup">
+            <button class="filter-btn active" data-filter="all">All Work</button>
+            <button class="filter-btn" data-filter="stone">Stone</button>
+            <button class="filter-btn" data-filter="floor">Floor Tiles</button>
+            <button class="filter-btn" data-filter="wall">Wall Tiles</button>
+            <button class="filter-btn" data-filter="stairs">Step Rizer (सीढ़ियां)</button>
+            <button class="filter-btn" data-filter="kitchen">Modular Kitchen</button>
+            <button class="filter-btn" data-filter="ramp">Ramp</button>
+            <button class="filter-btn" data-filter="pillar">Pillar</button>
         </div>
 
         <div class="loader" id="loader">Loading photos...</div>
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
 
-    <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
-        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+    <div id="lightboxModal" class="lightbox-modal">
+        <span class="lightbox-close" id="closeLightboxBtn">&times;</span>
         <div class="lightbox-content">
             <img id="lightboxImg" src="" alt="Full View">
         </div>
@@ -248,9 +246,9 @@
 
     <section class="admin-section">
         <h3>🔒 Admin Panel</h3>
-        <div class="admin-login" id="adminLogin">
+        <div class="admin-login" id="adminLoginBox">
             <input type="password" id="adminPass" placeholder="Admin Password">
-            <button onclick="adminLogin()">Login</button>
+            <button id="adminLoginSubmit">Login</button>
         </div>
         <div class="admin-status" id="adminStatus"></div>
     </section>
@@ -300,15 +298,38 @@
             pillar: "Pillar"
         };
 
-        // सभी फंक्शंस को 'window.' के साथ ग्लोबल स्कोप में देना अनिवार्य है
-        window.uploadPhotos = async function() {
-            const photoInput = document.getElementById('photoInput');
-            const categorySelect = document.getElementById('categorySelect');
-            const uploadBtn = document.getElementById('uploadBtn');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            const uploadStatus = document.getElementById('uploadStatus');
+        // DOM Elements
+        const photoInput = document.getElementById('photoInput');
+        const fileNameDiv = document.getElementById('fileName');
+        const galleryGrid = document.getElementById('galleryGrid');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const loader = document.getElementById('loader');
+        const categorySelect = document.getElementById('categorySelect');
+        const lightboxModal = document.getElementById('lightboxModal');
+        const lightboxImg = document.getElementById('lightboxImg');
 
+        // मोबाइल मेनू कंट्रोलर
+        document.getElementById('menuToggleBtn').addEventListener('click', function() {
+            document.getElementById('mobileNav').classList.toggle('active');
+        });
+        document.querySelectorAll('.mob-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileNav').classList.remove('active');
+            });
+        });
+
+        // फ़ाइल चयन टेक्स्ट
+        photoInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileNameDiv.textContent = `${this.files.length} photo selected`;
+            }
+        });
+
+        // फ़ोटो अपलोड इवेंट (नो ऑनक्लिक एरर)
+        uploadBtn.addEventListener('click', async function() {
             const files = photoInput.files;
             const selectedCategory = categorySelect.value;
 
@@ -325,9 +346,9 @@
             progressBar.style.display = 'block';
             uploadStatus.textContent = 'Uploading to ImgBB...';
             uploadStatus.style.color = 'var(--accent-color)';
+            progressFill.style.width = '30%';
 
             let uploadedCount = 0;
-            progressFill.style.width = '30%';
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -357,20 +378,4 @@
                     }
                 } catch (error) {
                     uploadStatus.textContent = 'Upload failed: ' + error.message;
-                    uploadStatus.style.color = 'var(--danger)';
-                    uploadBtn.disabled = false;
-                    progressBar.style.display = 'none';
-                    return;
-                }
-            }
-
-            progressFill.style.width = '100%';
-            photoInput.value = '';
-            document.getElementById('fileName').textContent = '';
-            categorySelect.value = ''; 
-            uploadBtn.disabled = false;
-            setTimeout(() => {
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-                uploadStatus.textContent = `✅ ${uploadedCount} photo (${categoryNames[selectedCategory]}) me upload ho gayi!`;
-   
+                    uploadStatus.styl
