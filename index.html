@@ -76,7 +76,12 @@
                       border-radius: 15px; border: 2px dashed rgba(212, 175, 55, 0.3); }
         .upload-box input[type="file"] { display: none; }
         .upload-label { display: inline-block; background: var(--accent-color); color: #0b111e;
-                        padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+                        padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; margin-bottom: 15px; }
+        
+        .select-style { background: var(--bg-color); color: white; padding: 12px 20px; border-radius: 25px;
+                        border: 1px solid rgba(212, 175, 55, 0.5); width: 80%; max-width: 300px; margin: 10px auto; 
+                        display: block; font-size: 0.95rem; outline: none; text-align: center; }
+
         .upload-btn { margin-top: 20px; background: #25D366; color: white; border: none;
                       padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; }
         .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -85,20 +90,37 @@
         #progressFill { height: 100%; background: var(--accent-color); width: 0%; transition: 0.3s; }
         #uploadStatus { margin-top: 15px; font-weight: 600; }
         
+        /* Filter Container CSS */
+        .filter-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+        .filter-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05);
+                      padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .filter-btn:hover, .filter-btn.active { background: var(--accent-color); color: #0b111e; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2); }
+
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                         gap: 25px; margin-top: 30px; }
         .photo-box { background-color: var(--card-bg); border-radius: 12px; overflow: hidden;
-                     position: relative; aspect-ratio: 4/3; }
+                     position: relative; aspect-ratio: 4/3; cursor: pointer; transition: 0.4s; }
+        .photo-box.hide { transform: scale(0); opacity: 0; display: none; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-tag { position: absolute; top: 10px; left: 10px; background: rgba(11, 17, 30, 0.85); 
+                     color: var(--accent-color); padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600; }
         .photo-caption { padding: 12px; font-size: 0.9rem; color: var(--text-muted); text-align: left; }
         .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger);
                       color: white; border: none; width: 30px; height: 30px; border-radius: 50%;
-                      cursor: pointer; font-size: 16px; display: none; }
+                      cursor: pointer; font-size: 16px; display: none; z-index: 10; }
         .admin-mode .delete-btn { display: block; }
         
+        /* Fullscreen Popup Model CSS */
+        .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                          background: rgba(5, 8, 15, 0.95); z-index: 2000; justify-content: center; align-items: center; }
+        .lightbox-content { position: relative; max-width: 90%; max-height: 90vh; display: flex; justify-content: center; align-items: center; }
+        .lightbox-content img { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 25px rgba(214, 175, 55, 0.2); }
+        .lightbox-close { position: fixed; top: 20px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer; z-index: 2100; }
+        .lightbox-close:hover { color: var(--accent-color); }
+
         .admin-section { background: rgba(239, 68, 68, 0.1); padding: 40px 8%; text-align: center; }
         .admin-login input { padding: 10px 20px; border-radius: 20px; border: 1px solid var(--text-muted);
-                             background: var(--card-bg); color: white; margin-right: 10px; }
+                             background: var(--card-bg); color: white; margin-right: 10px; outline: none; }
         .admin-login button { padding: 10px 25px; border-radius: 20px; border: none;
                               background: var(--danger); color: white; font-weight: 600; cursor: pointer; }
         .admin-status { margin-top: 15px; color: var(--accent-color); font-weight: 600; }
@@ -135,7 +157,7 @@
             <a href="#contact">Contact</a>
         </nav>
         <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span>
+            <span></span><span></span><span></span>
         </div>
         <div class="mobile-nav" id="mobileNav">
             <a href="#home" onclick="toggleMenu()">Home</a>
@@ -175,11 +197,23 @@
 
     <section class="upload-section">
         <h2>Photo <span>Upload Karein</span></h2>
-        <p class="sub-title">Apne kaam ki photo gallery me add karein. Sab visitors ko dikhegi</p>
+        <p class="sub-title">Apne kaam ki photo gallery me add karein. Category chunna na bhoolen!</p>
         <div class="upload-box">
             <input type="file" id="photoInput" accept="image/*" multiple>
             <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
-            <div id="fileName" style="margin-top: 15px; color: var(--text-muted);"></div>
+            <div id="fileName" style="margin-bottom: 15px; color: var(--text-muted);"></div>
+            
+            <select id="categorySelect" class="select-style">
+                <option value="" disabled selected>--- Category Chunein ---</option>
+                <option value="stone">Stone Work</option>
+                <option value="floor">Floor Tiles</option>
+                <option value="wall">Wall Tiles</option>
+                <option value="stairs">Step Rizer (सीढ़ियां)</option>
+                <option value="kitchen">Modular Kitchen</option>
+                <option value="ramp">Ramp Design</option>
+                <option value="pillar">Pillar Design</option>
+            </select>
+
             <button class="upload-btn" id="uploadBtn" onclick="uploadPhotos()">Gallery Me Add Karein</button>
             <div id="progressBar"><div id="progressFill"></div></div>
             <div id="uploadStatus"></div>
@@ -188,10 +222,29 @@
 
     <section class="gallery" id="gallery">
         <h2>Hamari <span>Photo Gallery</span></h2>
-        <p class="sub-title">Real projects - Live uploaded by users</p>
+        <p class="sub-title">Kam ke mutabik sahi gallery dekhne ke liye button dabayein</p>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterGallery('all', this)">All Work</button>
+            <button class="filter-btn" onclick="filterGallery('stone', this)">Stone</button>
+            <button class="filter-btn" onclick="filterGallery('floor', this)">Floor Tiles</button>
+            <button class="filter-btn" onclick="filterGallery('wall', this)">Wall Tiles</button>
+            <button class="filter-btn" onclick="filterGallery('stairs', this)">Step Rizer (सीढ़ियां)</button>
+            <button class="filter-btn" onclick="filterGallery('kitchen', this)">Modular Kitchen</button>
+            <button class="filter-btn" onclick="filterGallery('ramp', this)">Ramp</button>
+            <button class="filter-btn" onclick="filterGallery('pillar', this)">Pillar</button>
+        </div>
+
         <div class="loader" id="loader">Loading photos...</div>
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
+
+    <div id="lightboxModal" class="lightbox-modal">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="Full View">
+        </div>
+    </div>
 
     <section class="admin-section">
         <h3>🔒 Admin Panel</h3>
@@ -225,16 +278,27 @@
           apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
+          databaseURL: "https://aashu-tiles-default-rtdb.firebaseio.com",
           measurementId: "G-WQ0CTGJ9HZ"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // आपकी ImgBB API Key यहाँ सेट कर दी गई है
         const IMGBB_API_KEY = "fe777ba740a06fa8c43847b43122bea4";
         
         let isAdmin = false;
+        let currentFilter = 'all';
+
+        const categoryNames = {
+            stone: "Stone Work",
+            floor: "Floor Tiles",
+            wall: "Wall Tiles",
+            stairs: "Step Rizer",
+            kitchen: "Modular Kitchen",
+            ramp: "Ramp",
+            pillar: "Pillar"
+        };
 
         const photoInput = document.getElementById('photoInput');
         const fileNameDiv = document.getElementById('fileName');
@@ -244,6 +308,7 @@
         const progressFill = document.getElementById('progressFill');
         const uploadStatus = document.getElementById('uploadStatus');
         const loader = document.getElementById('loader');
+        const categorySelect = document.getElementById('categorySelect');
 
         photoInput.addEventListener('change', function() {
             if (this.files.length > 0) {
@@ -253,8 +318,14 @@
 
         window.uploadPhotos = async function() {
             const files = photoInput.files;
+            const selectedCategory = categorySelect.value;
+
             if (files.length === 0) {
                 alert('Pehle photo choose karo');
+                return;
+            }
+            if (!selectedCategory) {
+                alert('Kripya photo ki sahi Category chunein!');
                 return;
             }
 
@@ -284,6 +355,7 @@
                         await addDoc(collection(db, "gallery"), {
                             url: result.data.url,
                             name: file.name,
+                            category: selectedCategory,
                             deleteUrl: result.data.delete_url,
                             timestamp: serverTimestamp()
                         });
@@ -303,77 +375,5 @@
             progressFill.style.width = '100%';
             photoInput.value = '';
             fileNameDiv.textContent = '';
-            uploadBtn.disabled = false;
-            setTimeout(() => {
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-                uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
-                uploadStatus.style.color = 'var(--success)';
-            }, 500);
-            setTimeout(() => uploadStatus.textContent = '', 4000);
-        }
-
-        onSnapshot(collection(db, "gallery"), (snapshot) => {
-            loader.style.display = 'none';
-            galleryGrid.innerHTML = '';
-            if (snapshot.empty) {
-                galleryGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">Abhi koi photo nahi hai. Pehli photo upload karo!</p>';
-                return;
-            }
-            const docs = snapshot.docs.sort((a, b) => {
-                const timeA = a.data().timestamp?.seconds || 0;
-                const timeB = b.data().timestamp?.seconds || 0;
-                return timeB - timeA;
-            });
-            
-            docs.forEach((docSnap) => {
-                const data = docSnap.data();
-                addPhotoToGallery(data.url, data.name, docSnap.id);
-            });
-        });
-
-        function addPhotoToGallery(url, name, docId) {
-            const photoBox = document.createElement('div');
-            photoBox.className = 'photo-box';
-            photoBox.innerHTML = `
-                <img src="${url}" alt="${name}" loading="lazy">
-                <button class="delete-btn" onclick="deletePhoto('${docId}')">×</button>
-                <div class="photo-caption">${name.substring(0, 25)}</div>
-            `;
-            galleryGrid.appendChild(photoBox);
-        }
-
-        window.adminLogin = function() {
-            const pass = document.getElementById('adminPass').value;
-            if (btoa(pass) === "YWFzaHVAMjAyNg==") {
-                isAdmin = true;
-                document.body.classList.add('admin-mode');
-                document.getElementById('adminStatus').textContent = '✅ Admin Mode Active - Delete button dikh raha hai';
-                document.getElementById('adminLogin').style.display = 'none';
-            } else {
-                alert('Galat password');
-            }
-        }
-
-        window.deletePhoto = async function(docId) {
-            if (!isAdmin) {
-                alert('Admin login required');
-                return;
-            }
-            if (confirm('Gallery se photo delete karni hai?')) {
-                try {
-                    await deleteDoc(doc(db, "gallery", docId));
-                } catch (error) {
-                    alert('Delete failed: ' + error.message);
-                }
-            }
-        }
-
-        window.toggleMenu = function() {
-            document.getElementById('mobileNav').classList.toggle('active');
-        }
-    </script>
-
-</body>
-    </html>
-    
+            categorySelect.value = ''; 
+      
