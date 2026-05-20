@@ -220,24 +220,19 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } 
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } 
-                from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        // क्लाउडफ्लेयर एन्वायरनमेंट वैरिएबल्स सेटअप सपोर्ट।
-        // अगर प्रोडक्शन एन्वायरमेंट से चाबी नहीं मिलेगी, तो यह डिफ़ॉल्ट रूप से इस स्ट्रिंग को पढ़ेगा।
         const firebaseConfig = {
-          apiKey: (typeof process !== 'undefined' && process.env?.FIREBASE_API_KEY) || "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
+          apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
-          storageBucket: "aashu-tiles.firebasestorage.app",
-          messagingSenderId: "140809525543",
-          appId: "1:140809525543:web:d4f980a4bbbff57c28b102",
           measurementId: "G-WQ0CTGJ9HZ"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+        
+        // आपकी ImgBB API Key यहाँ सेट कर दी गई है
+        const IMGBB_API_KEY = "fe777ba740a06fa8c43847b43122bea4";
         
         let isAdmin = false;
 
@@ -265,51 +260,57 @@
 
             uploadBtn.disabled = true;
             progressBar.style.display = 'block';
-            uploadStatus.textContent = 'Uploading...';
+            uploadStatus.textContent = 'Uploading to ImgBB...';
             uploadStatus.style.color = 'var(--accent-color)';
 
             let uploadedCount = 0;
+            progressFill.style.width = '30%';
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const fileName = `${Date.now()}_${file.name}`;
-                const storageRef = ref(storage, `gallery/${fileName}`);
-                const uploadTask = uploadBytesResumable(storageRef, file);
+                const formData = new FormData();
+                formData.append("image", file);
 
-                await new Promise((resolve, reject) => {
-                    uploadTask.on('state_changed', 
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            progressFill.style.width = progress + '%';
-                        },
-                        (error) => { 
-                            uploadStatus.textContent = 'Upload failed: ' + error.message;
-                            uploadStatus.style.color = 'var(--danger)';
-                            reject(error); 
-                        },
-                        async () => {
-                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            await addDoc(collection(db, "gallery"), {
-                                url: downloadURL,
-                                name: file.name,
-                                fileName: fileName,
-                                timestamp: serverTimestamp()
-                            });
-                            uploadedCount++;
-                            resolve();
-                        }
-                    );
-                });
+                try {
+                    progressFill.style.width = '60%';
+                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        await addDoc(collection(db, "gallery"), {
+                            url: result.data.url,
+                            name: file.name,
+                            deleteUrl: result.data.delete_url,
+                            timestamp: serverTimestamp()
+                        });
+                        uploadedCount++;
+                    } else {
+                        throw new Error(result.error.message);
+                    }
+                } catch (error) {
+                    uploadStatus.textContent = 'Upload failed: ' + error.message;
+                    uploadStatus.style.color = 'var(--danger)';
+                    uploadBtn.disabled = false;
+                    progressBar.style.display = 'none';
+                    return;
+                }
             }
 
+            progressFill.style.width = '100%';
             photoInput.value = '';
             fileNameDiv.textContent = '';
             uploadBtn.disabled = false;
-            progressBar.style.display = 'none';
-            progressFill.style.width = '0%';
-            uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
-            uploadStatus.style.color = 'var(--success)';
-            setTimeout(() => uploadStatus.textContent = '', 3000);
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+                uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
+                uploadStatus.style.color = 'var(--success)';
+            }, 500);
+            setTimeout(() => uploadStatus.textContent = '', 4000);
         }
 
         onSnapshot(collection(db, "gallery"), (snapshot) => {
@@ -319,19 +320,24 @@
                 galleryGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">Abhi koi photo nahi hai. Pehli photo upload karo!</p>';
                 return;
             }
-            const docs = snapshot.docs.sort((a, b) => b.data().timestamp?.seconds - a.data().timestamp?.seconds);
+            const docs = snapshot.docs.sort((a, b) => {
+                const timeA = a.data().timestamp?.seconds || 0;
+                const timeB = b.data().timestamp?.seconds || 0;
+                return timeB - timeA;
+            });
+            
             docs.forEach((docSnap) => {
                 const data = docSnap.data();
-                addPhotoToGallery(data.url, data.name, docSnap.id, data.fileName);
+                addPhotoToGallery(data.url, data.name, docSnap.id);
             });
         });
 
-        function addPhotoToGallery(url, name, docId, fileName) {
+        function addPhotoToGallery(url, name, docId) {
             const photoBox = document.createElement('div');
             photoBox.className = 'photo-box';
             photoBox.innerHTML = `
                 <img src="${url}" alt="${name}" loading="lazy">
-                <button class="delete-btn" onclick="deletePhoto('${docId}', '${fileName}')">×</button>
+                <button class="delete-btn" onclick="deletePhoto('${docId}')">×</button>
                 <div class="photo-caption">${name.substring(0, 25)}</div>
             `;
             galleryGrid.appendChild(photoBox);
@@ -339,7 +345,6 @@
 
         window.adminLogin = function() {
             const pass = document.getElementById('adminPass').value;
-            // पासवर्ड 'aashu@2026' को कोड सुरक्षा के लिए एन्कोड किया गया है।
             if (btoa(pass) === "YWFzaHVAMjAyNg==") {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
@@ -350,16 +355,14 @@
             }
         }
 
-        window.deletePhoto = async function(docId, fileName) {
+        window.deletePhoto = async function(docId) {
             if (!isAdmin) {
                 alert('Admin login required');
                 return;
             }
-            if (confirm('Photo delete karni hai?')) {
+            if (confirm('Gallery se photo delete karni hai?')) {
                 try {
                     await deleteDoc(doc(db, "gallery", docId));
-                    const storageRef = ref(storage, `gallery/${fileName}`);
-                    await deleteObject(storageRef);
                 } catch (error) {
                     alert('Delete failed: ' + error.message);
                 }
