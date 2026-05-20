@@ -90,7 +90,7 @@
         #progressFill { height: 100%; background: var(--accent-color); width: 0%; transition: 0.3s; }
         #uploadStatus { margin-top: 15px; font-weight: 600; }
         
-        /* Filter Container CSS */
+        /* Filter Container Styles */
         .filter-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
         .filter-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05);
                       padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: 0.3s; }
@@ -110,11 +110,11 @@
                       cursor: pointer; font-size: 16px; display: none; z-index: 10; }
         .admin-mode .delete-btn { display: block; }
         
-        /* Fullscreen Popup Model CSS */
+        /* 9:16 Fullscreen Modal CSS */
         .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
                           background: rgba(5, 8, 15, 0.95); z-index: 2000; justify-content: center; align-items: center; }
-        .lightbox-content { position: relative; max-width: 90%; max-height: 90vh; display: flex; justify-content: center; align-items: center; }
-        .lightbox-content img { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 25px rgba(214, 175, 55, 0.2); }
+        .lightbox-content { position: relative; width: 90%; max-width: 450px; height: 85vh; display: flex; justify-content: center; align-items: center; }
+        .lightbox-content img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
         .lightbox-close { position: fixed; top: 20px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer; z-index: 2100; }
         .lightbox-close:hover { color: var(--accent-color); }
 
@@ -157,7 +157,7 @@
             <a href="#contact">Contact</a>
         </nav>
         <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
+            <span></span><span></span>
         </div>
         <div class="mobile-nav" id="mobileNav">
             <a href="#home" onclick="toggleMenu()">Home</a>
@@ -201,7 +201,7 @@
         <div class="upload-box">
             <input type="file" id="photoInput" accept="image/*" multiple>
             <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
-            <div id="fileName" style="margin-bottom: 15px; color: var(--text-muted);"></div>
+            <div id="fileName" style="margin-top: 15px; color: var(--text-muted);"></div>
             
             <select id="categorySelect" class="select-style">
                 <option value="" disabled selected>--- Category Chunein ---</option>
@@ -239,8 +239,8 @@
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
 
-    <div id="lightboxModal" class="lightbox-modal">
-        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
+        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
         <div class="lightbox-content">
             <img id="lightboxImg" src="" alt="Full View">
         </div>
@@ -300,23 +300,15 @@
             pillar: "Pillar"
         };
 
-        const photoInput = document.getElementById('photoInput');
-        const fileNameDiv = document.getElementById('fileName');
-        const galleryGrid = document.getElementById('galleryGrid');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const loader = document.getElementById('loader');
-        const categorySelect = document.getElementById('categorySelect');
-
-        photoInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileNameDiv.textContent = `${this.files.length} photo selected`;
-            }
-        });
-
+        // सभी फंक्शंस को 'window.' के साथ ग्लोबल स्कोप में देना अनिवार्य है
         window.uploadPhotos = async function() {
+            const photoInput = document.getElementById('photoInput');
+            const categorySelect = document.getElementById('categorySelect');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const uploadStatus = document.getElementById('uploadStatus');
+
             const files = photoInput.files;
             const selectedCategory = categorySelect.value;
 
@@ -374,6 +366,11 @@
 
             progressFill.style.width = '100%';
             photoInput.value = '';
-            fileNameDiv.textContent = '';
+            document.getElementById('fileName').textContent = '';
             categorySelect.value = ''; 
-      
+            uploadBtn.disabled = false;
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+                uploadStatus.textContent = `✅ ${uploadedCount} photo (${categoryNames[selectedCategory]}) me upload ho gayi!`;
+   
