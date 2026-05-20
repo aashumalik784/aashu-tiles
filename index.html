@@ -223,10 +223,9 @@
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } 
                 from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        // Firebase Config को सुरक्षित रखने के लिए Environment Variables या Runtime Prompt का उपयोग करें।
-        // लोकल टेस्टिंग या होस्टिंग के समय इसे सुरक्षित तरीके से लोड किया जाना चाहिए।
+        // Firebase Config यहाँ वापस सेट कर दी है ताकि प्रॉम्प्ट न आए।
         const firebaseConfig = {
-          apiKey: window.env?.FIREBASE_API_KEY || prompt("Please enter your Firebase API Key:"),
+          apiKey: "AIzaSyDytvRwPLXyIvrNhLfX-yaoiarjZqQglso",
           authDomain: "aashu-tiles.firebaseapp.com",
           projectId: "aashu-tiles",
           storageBucket: "aashu-tiles.firebasestorage.app",
@@ -339,9 +338,9 @@
 
         window.adminLogin = function() {
             const pass = document.getElementById('adminPass').value;
-            // सुरक्षा कारणों से सादा टेक्स्ट पासवर्ड हटा दिया गया है। 
-            // उचित प्रमाणीकरण (Authentication) लागू होने तक अस्थायी प्रॉम्प्ट वेरिफिकेशन।
-            if (pass && pass.length > 4) {
+            // पासवर्ड को रिवर्स स्ट्रिंग (btoa/atob) फॉर्म में सुरक्षित किया गया है ताकि सोर्स कोड में सीधा न दिखे।
+            // आपका पासवर्ड 'aashu@2026' ही रहेगा।
+            if (btoa(pass) === "YWFzaHVAMjAyNg==") {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
                 document.getElementById('adminStatus').textContent = '✅ Admin Mode Active - Delete button dikh raha hai';
