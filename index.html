@@ -80,7 +80,7 @@
         
         .select-style { background: var(--bg-color); color: white; padding: 12px 20px; border-radius: 25px;
                         border: 1px solid rgba(212, 175, 55, 0.5); width: 80%; max-width: 300px; margin: 10px auto; 
-                        display: block; font-size: 0.95rem; outline: none; }
+                        display: block; font-size: 0.95rem; outline: none; text-align: center; }
 
         .upload-btn { margin-top: 20px; background: #25D366; color: white; border: none;
                       padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; }
@@ -90,7 +90,6 @@
         #progressFill { height: 100%; background: var(--accent-color); width: 0%; transition: 0.3s; }
         #uploadStatus { margin-top: 15px; font-weight: 600; }
         
-        /* Filter Buttons Styling */
         .filter-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
         .filter-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05);
                       padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: 0.3s; }
@@ -112,7 +111,7 @@
         
         .admin-section { background: rgba(239, 68, 68, 0.1); padding: 40px 8%; text-align: center; }
         .admin-login input { padding: 10px 20px; border-radius: 20px; border: 1px solid var(--text-muted);
-                             background: var(--card-bg); color: white; margin-right: 10px; }
+                             background: var(--card-bg); color: white; margin-right: 10px; outline: none; }
         .admin-login button { padding: 10px 25px; border-radius: 20px; border: none;
                               background: var(--danger); color: white; font-weight: 600; cursor: pointer; }
         .admin-status { margin-top: 15px; color: var(--accent-color); font-weight: 600; }
@@ -269,13 +268,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // ImgBB API Key
         const IMGBB_API_KEY = "fe777ba740a06fa8c43847b43122bea4";
         
         let isAdmin = false;
         let currentFilter = 'all';
 
-        // कैटेगरीज के नाम हिंदी/साफ टेक्स्ट डिस्प्ले के लिए
         const categoryNames = {
             stone: "Stone Work",
             floor: "Floor Tiles",
@@ -338,7 +335,6 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        // डेटाबेस में कैटेगरी भी सेव हो रही है
                         await addDoc(collection(db, "gallery"), {
                             url: result.data.url,
                             name: file.name,
@@ -362,7 +358,7 @@
             progressFill.style.width = '100%';
             photoInput.value = '';
             fileNameDiv.textContent = '';
-            categorySelect.value = ''; // Reset select
+            categorySelect.value = ''; 
             uploadBtn.disabled = false;
             setTimeout(() => {
                 progressBar.style.display = 'none';
@@ -383,4 +379,9 @@
             const docs = snapshot.docs.sort((a, b) => {
                 const timeA = a.data().timestamp?.seconds || 0;
                 const timeB = b.data().timestamp?.seconds || 0;
- 
+                return timeB - timeA;
+            });
+            
+            docs.forEach((docSnap) => {
+                const data = docSnap.data();
+                
