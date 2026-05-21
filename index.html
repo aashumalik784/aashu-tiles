@@ -80,30 +80,30 @@
         .upload-btn { margin-top: 20px; background: #25D366; color: white; border: none;
                       padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; }
         .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        #progressBar { width: 100%; height: 6px; background: var(--bg-color); border-radius: 10px; 
-                       margin-top: 20px; overflow: hidden; display: none; }
-        #progressFill { height: 100%; background: var(--accent-color); width: 0%; transition: 0.3s; }
-        #uploadStatus { margin-top: 15px; font-weight: 600; }
-        
+
+        .category-filters { margin: 30px 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .filter-btn { padding: 10px 18px; background: var(--card-bg); color: var(--text-muted); border: none; 
+                      border-radius: 30px; cursor: pointer; font-size: 0.95rem; }
+        .filter-btn.active { background: var(--accent-color); color: #0b111e; font-weight: 600; }
+
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                         gap: 25px; margin-top: 30px; }
         .photo-box { background-color: var(--card-bg); border-radius: 12px; overflow: hidden;
-                     position: relative; aspect-ratio: 4/3; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+                     position: relative; aspect-ratio: 4/3; cursor: pointer; }
+        .photo-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        .photo-box:hover img { transform: scale(1.05); }
         .photo-caption { padding: 12px; font-size: 0.9rem; color: var(--text-muted); text-align: left; }
         .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger);
                       color: white; border: none; width: 30px; height: 30px; border-radius: 50%;
                       cursor: pointer; font-size: 16px; display: none; }
         .admin-mode .delete-btn { display: block; }
-        
+
         .admin-section { background: rgba(239, 68, 68, 0.1); padding: 40px 8%; text-align: center; }
         .admin-login input { padding: 10px 20px; border-radius: 20px; border: 1px solid var(--text-muted);
                              background: var(--card-bg); color: white; margin-right: 10px; }
         .admin-login button { padding: 10px 25px; border-radius: 20px; border: none;
                               background: var(--danger); color: white; font-weight: 600; cursor: pointer; }
-        .admin-status { margin-top: 15px; color: var(--accent-color); font-weight: 600; }
-        
-        .loader { text-align: center; padding: 40px; color: var(--text-muted); }
+
         .sticky-cta { position: fixed; bottom: 20px; right: 20px; display: flex;
                       flex-direction: column; gap: 12px; z-index: 999; }
         .sticky-cta a { width: 55px; height: 55px; border-radius: 50%; display: flex;
@@ -121,6 +121,7 @@
             .hero h1 { font-size: 2.3rem; }
             nav { display: none; }
             .hamburger { display: flex; }
+            .category-filters { justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; }
         }
     </style>
 </head>
@@ -175,20 +176,48 @@
 
     <section class="upload-section">
         <h2>Photo <span>Upload Karein</span></h2>
-        <p class="sub-title">Apne kaam ki photo gallery me add karein. Sab visitors ko dikhegi</p>
+        <p class="sub-title">Apne kaam ki photo gallery me add karein. Category select karna na bhoolen</p>
         <div class="upload-box">
             <input type="file" id="photoInput" accept="image/*" multiple>
             <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
-            <div id="fileName" style="margin-top: 15px; color: var(--text-muted);"></div>
+            
+            <div style="margin:25px 0;">
+                <select id="categorySelect" style="width:100%; max-width:420px; padding:12px 15px; border-radius:8px; background:#1e2a44; color:white; border:1px solid #d4af37;">
+                    <option value="">-- Category Select Karein --</option>
+                    <option value="floor-tiles">Floor Tiles</option>
+                    <option value="wall-tiles">Wall Tiles</option>
+                    <option value="stone">Stone / Marble / Granite</option>
+                    <option value="modular-kitchen">Modular Kitchen</option>
+                    <option value="pillar">Pillar Design</option>
+                    <option value="step-riser">Step Riser / Seedhiyan</option>
+                    <option value="elevation">Elevation & Cladding</option>
+                    <option value="others">Others</option>
+                </select>
+            </div>
+
             <button class="upload-btn" id="uploadBtn" onclick="uploadPhotos()">Gallery Me Add Karein</button>
-            <div id="progressBar"><div id="progressFill"></div></div>
-            <div id="uploadStatus"></div>
+            <div id="progressBar" style="width:100%; height:6px; background:#1e2a44; border-radius:10px; margin-top:20px; overflow:hidden; display:none;">
+                <div id="progressFill" style="height:100%; background:var(--accent-color); width:0%; transition:0.3s;"></div>
+            </div>
+            <div id="uploadStatus" style="margin-top:15px; font-weight:600;"></div>
         </div>
     </section>
 
     <section class="gallery" id="gallery">
         <h2>Hamari <span>Photo Gallery</span></h2>
-        <p class="sub-title">Real projects - Live uploaded by users</p>
+        <p class="sub-title">Real projects - Category wise dekhein</p>
+        
+        <div class="category-filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="floor-tiles">Floor Tiles</button>
+            <button class="filter-btn" data-category="wall-tiles">Wall Tiles</button>
+            <button class="filter-btn" data-category="stone">Stone Work</button>
+            <button class="filter-btn" data-category="modular-kitchen">Modular Kitchen</button>
+            <button class="filter-btn" data-category="pillar">Pillar Design</button>
+            <button class="filter-btn" data-category="step-riser">Step Riser</button>
+            <button class="filter-btn" data-category="elevation">Elevation</button>
+        </div>
+
         <div class="loader" id="loader">Loading photos...</div>
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
@@ -231,13 +260,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // आपकी ImgBB API Key यहाँ सेट कर दी गई है
         const IMGBB_API_KEY = "fe777ba740a06fa8c43847b43122bea4";
         
         let isAdmin = false;
+        let allPhotos = [];
 
         const photoInput = document.getElementById('photoInput');
-        const fileNameDiv = document.getElementById('fileName');
+        const fileNameDiv = document.getElementById('fileName') || document.createElement('div');
         const galleryGrid = document.getElementById('galleryGrid');
         const uploadBtn = document.getElementById('uploadBtn');
         const progressBar = document.getElementById('progressBar');
@@ -245,26 +274,26 @@
         const uploadStatus = document.getElementById('uploadStatus');
         const loader = document.getElementById('loader');
 
-        photoInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileNameDiv.textContent = `${this.files.length} photo selected`;
-            }
-        });
-
+        // Upload Function
         window.uploadPhotos = async function() {
             const files = photoInput.files;
+            const category = document.getElementById('categorySelect').value;
+
             if (files.length === 0) {
                 alert('Pehle photo choose karo');
+                return;
+            }
+            if (!category) {
+                alert('Please select a category!');
                 return;
             }
 
             uploadBtn.disabled = true;
             progressBar.style.display = 'block';
-            uploadStatus.textContent = 'Uploading to ImgBB...';
+            uploadStatus.textContent = 'Uploading...';
             uploadStatus.style.color = 'var(--accent-color)';
 
             let uploadedCount = 0;
-            progressFill.style.width = '30%';
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -284,96 +313,84 @@
                         await addDoc(collection(db, "gallery"), {
                             url: result.data.url,
                             name: file.name,
-                            deleteUrl: result.data.delete_url,
+                            category: category,
                             timestamp: serverTimestamp()
                         });
                         uploadedCount++;
-                    } else {
-                        throw new Error(result.error.message);
                     }
                 } catch (error) {
-                    uploadStatus.textContent = 'Upload failed: ' + error.message;
+                    uploadStatus.textContent = 'Error: ' + error.message;
                     uploadStatus.style.color = 'var(--danger)';
                     uploadBtn.disabled = false;
-                    progressBar.style.display = 'none';
                     return;
                 }
             }
 
             progressFill.style.width = '100%';
             photoInput.value = '';
-            fileNameDiv.textContent = '';
+            document.getElementById('categorySelect').value = '';
             uploadBtn.disabled = false;
+            
             setTimeout(() => {
                 progressBar.style.display = 'none';
                 progressFill.style.width = '0%';
-                uploadStatus.textContent = `✅ ${uploadedCount} photo upload ho gayi!`;
+                uploadStatus.textContent = `✅ ${uploadedCount} photos uploaded successfully!`;
                 uploadStatus.style.color = 'var(--success)';
-            }, 500);
-            setTimeout(() => uploadStatus.textContent = '', 4000);
-        }
+            }, 800);
+        };
 
+        // Real-time Gallery
         onSnapshot(collection(db, "gallery"), (snapshot) => {
             loader.style.display = 'none';
-            galleryGrid.innerHTML = '';
-            if (snapshot.empty) {
-                galleryGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">Abhi koi photo nahi hai. Pehli photo upload karo!</p>';
-                return;
-            }
-            const docs = snapshot.docs.sort((a, b) => {
-                const timeA = a.data().timestamp?.seconds || 0;
-                const timeB = b.data().timestamp?.seconds || 0;
-                return timeB - timeA;
-            });
-            
-            docs.forEach((docSnap) => {
-                const data = docSnap.data();
-                addPhotoToGallery(data.url, data.name, docSnap.id);
-            });
+            allPhotos = snapshot.docs.map(docSnap => ({
+                id: docSnap.id,
+                ...docSnap.data()
+            })).sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            renderGallery("all");
         });
 
-        function addPhotoToGallery(url, name, docId) {
-            const photoBox = document.createElement('div');
-            photoBox.className = 'photo-box';
-            photoBox.innerHTML = `
-                <img src="${url}" alt="${name}" loading="lazy">
-                <button class="delete-btn" onclick="deletePhoto('${docId}')">×</button>
-                <div class="photo-caption">${name.substring(0, 25)}</div>
-            `;
-            galleryGrid.appendChild(photoBox);
-        }
+        function renderGallery(filter) {
+            galleryGrid.innerHTML = '';
+            const filtered = filter === "all" 
+                ? allPhotos 
+                : allPhotos.filter(p => p.category === filter);
 
-        window.adminLogin = function() {
-            const pass = document.getElementById('adminPass').value;
-            if (btoa(pass) === "YWFzaHVAMjAyNg==") {
-                isAdmin = true;
-                document.body.classList.add('admin-mode');
-                document.getElementById('adminStatus').textContent = '✅ Admin Mode Active - Delete button dikh raha hai';
-                document.getElementById('adminLogin').style.display = 'none';
-            } else {
-                alert('Galat password');
-            }
-        }
-
-        window.deletePhoto = async function(docId) {
-            if (!isAdmin) {
-                alert('Admin login required');
+            if (filtered.length === 0) {
+                galleryGrid.innerHTML = `<p style="grid-column:1/-1; color:var(--text-muted);">Is category mein abhi koi photo nahi hai.</p>`;
                 return;
             }
-            if (confirm('Gallery se photo delete karni hai?')) {
-                try {
-                    await deleteDoc(doc(db, "gallery", docId));
-                } catch (error) {
-                    alert('Delete failed: ' + error.message);
-                }
-            }
+
+            filtered.forEach(photo => {
+                const div = document.createElement('div');
+                div.className = 'photo-box';
+                div.innerHTML = `
+                    <img src="\( {photo.url}" alt=" \){photo.name}" loading="lazy">
+                    <button class="delete-btn" onclick="deletePhoto('${photo.id}')">×</button>
+                    <div class="photo-caption">\( {getCategoryName(photo.category)}<br><small> \){photo.name.substring(0,25)}</small></div>
+                `;
+                div.querySelector('img').addEventListener('click', () => openLightbox(photo.url));
+                galleryGrid.appendChild(div);
+            });
         }
 
-        window.toggleMenu = function() {
-            document.getElementById('mobileNav').classList.toggle('active');
+        function getCategoryName(cat) {
+            const names = {
+                "floor-tiles": "Floor Tiles",
+                "wall-tiles": "Wall Tiles",
+                "stone": "Stone Work",
+                "modular-kitchen": "Modular Kitchen",
+                "pillar": "Pillar Design",
+                "step-riser": "Step Riser",
+                "elevation": "Elevation",
+                "others": "Others"
+            };
+            return names[cat] || cat;
         }
-    </script>
 
-</body>
-    </html>
-    
+        // Lightbox - Full Screen View
+        function openLightbox(url) {
+            const lb = document.createElement('div');
+            lb.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);display:flex;align-items:center;justify-content:center;z-index:10000;`;
+            lb.innerHTML = `
+                <img src="${url}"
