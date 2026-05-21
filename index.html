@@ -4,126 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aashu Tiles & Stones Work | Shamli</title>
-    <meta name="description" content="Shamli में premium Tiles, Marble, Granite, Modular Kitchen & Stone Cladding का काम। 10+ साल का अनुभव।">
+    <meta name="description" content="Shamli me best Tiles, Marble, Granite & Modular Kitchen ka kaam">
 
     <style>
         :root {
             --bg-color: #0b111e; --card-bg: #151f32; --accent-color: #d4af37;
-            --text-main: #ffffff; --text-muted: #94a3b8; --danger: #ef4444; --success: #22c55e;
+            --text-main: #ffffff; --text-muted: #94a3b8; --danger: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; 
-                 background: rgba(11, 17, 30, 0.95); position: fixed; width: 100%; top: 0; z-index: 1000; }
-        .logo { font-size: 24px; font-weight: 700; }
-        .logo span { color: var(--accent-color); }
+        body { background-color: var(--bg-color); color: var(--text-main); }
 
         section { padding: 80px 8%; text-align: center; }
-        h2 { font-size: 2.4rem; margin-bottom: 15px; }
+        h2 { font-size: 2.4rem; margin-bottom: 10px; }
         h2 span { color: var(--accent-color); }
 
-        .about { background: rgba(21, 31, 50, 0.6); }
-        .about p { max-width: 800px; margin: 0 auto 25px; font-size: 1.1rem; color: var(--text-muted); }
+        .upload-box { max-width: 620px; margin: 0 auto; background: var(--card-bg); padding: 35px;
+                      border-radius: 15px; border: 2px dashed var(--accent-color); }
 
-        .upload-box { max-width: 620px; margin: 0 auto; background: var(--card-bg); padding: 40px;
-                      border-radius: 15px; border: 2px dashed rgba(212, 175, 55, 0.4); }
-        .upload-label { background: var(--accent-color); color: #0b111e; padding: 12px 30px; 
-                        border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-block; margin: 15px 0; }
-
-        .category-filters { margin: 30px 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .filter-btn { padding: 10px 18px; background: var(--card-bg); color: var(--text-muted); border: none; 
-                      border-radius: 30px; cursor: pointer; }
+        .category-filters { margin: 25px 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .filter-btn { padding: 10px 18px; background: #1e2a44; color: #ccc; border: none; 
+                      border-radius: 30px; cursor: pointer; font-size: 0.95rem; }
         .filter-btn.active { background: var(--accent-color); color: #0b111e; font-weight: 600; }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .photo-box { background: var(--card-bg); border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 4/3; cursor: pointer; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
-        .photo-box:hover img { transform: scale(1.06); }
-        .photo-caption { padding: 12px; color: var(--text-muted); font-size: 0.9rem; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; 
-                      border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 20px; display: none; cursor: pointer; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .photo-box { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            position: relative; 
+            aspect-ratio: 16/12;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .photo-box img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
+        }
+        .photo-caption { 
+            padding: 12px; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            text-align: left;
+        }
+        .delete-btn { 
+            position: absolute; top: 10px; right: 10px; 
+            background: var(--danger); color: white; 
+            border: none; width: 35px; height: 35px; 
+            border-radius: 50%; font-size: 22px; 
+            display: none; z-index: 10;
+        }
         .admin-mode .delete-btn { display: block; }
 
-        .sticky-cta { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 15px; z-index: 999; }
-        .sticky-cta a { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; 
-                        justify-content: center; font-size: 28px; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .no-photos { grid-column: 1 / -1; color: #777; padding: 40px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Aashu<span>Tiles.</span></div>
-        <div onclick="toggleMenu()" style="font-size:28px; cursor:pointer;">☰</div>
+    <header style="background:rgba(11,17,30,0.95); padding:20px 8%; position:fixed; width:100%; top:0; z-index:1000; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:24px; font-weight:700;">Aashu<span style="color:#d4af37;">Tiles.</span></div>
+        <div onclick="toggleMenu()" style="font-size:28px; cursor:pointer; color:white;">☰</div>
     </header>
 
-    <section class="hero">
+    <section style="padding-top:100px;">
         <h1>Aashu Tiles & <span>Stones Work</span></h1>
-        <p>Shamli, Uttar Pradesh | 10+ Years Experience</p>
+        <p>Shamli • 10+ Years Experience</p>
     </section>
 
-    <!-- About / Work Description -->
-    <section class="about">
+    <!-- About -->
+    <section style="background:rgba(21,31,50,0.6);">
         <h2>Hamara <span>Kaam</span></h2>
-        <p>
-            हम <strong>Aashu Tiles & Stones Work</strong> Shamli में premium quality Tiles, Marble, Granite, Modular Kitchen 
-            और Stone Cladding का काम करते हैं। 10 साल से ज्यादा का अनुभव है। 
-        </p>
-        <p>
-            हमारी खासियत है <strong>परफेक्ट फिनिशिंग</strong>, सही मटेरियल, समय पर काम पूरा करना और उचित दाम। 
-            Floor Tiles, Wall Tiles, Kitchen Countertop, Step Riser, Pillar Design, Elevation Work — 
-            सभी प्रकार के काम हम बेहतरीन तरीके से करते हैं।
-        </p>
-        <p>
-            <strong>Free Site Visit</strong> उपलब्ध है। आपका सपनों का घर सुंदर और मजबूत बनाने में हम आपका भरोसेमंद साथी हैं।
+        <p style="max-width:800px; margin:0 auto; color:#94a3b8;">
+            Shamli mein premium Tiles Fitting, Marble, Granite, Modular Kitchen, Pillar, Step Riser aur Elevation ka kaam poori imandari aur best finishing ke saath.
         </p>
     </section>
 
+    <!-- Upload -->
     <section class="upload-section">
         <h2>Photo <span>Upload Karein</span></h2>
         <div class="upload-box">
             <input type="file" id="photoInput" accept="image/*" multiple>
-            <label for="photoInput" class="upload-label">📸 Photo Choose Karein</label>
+            <label for="photoInput" style="background:#d4af37; color:#0b111e; padding:12px 30px; border-radius:30px; cursor:pointer; display:inline-block; margin:15px 0;">
+                📸 Photos Choose Karein
+            </label>
             
             <select id="categorySelect" style="width:100%; padding:12px; margin:15px 0; border-radius:8px; background:#1e2a44; color:white;">
                 <option value="">-- Category Select Karein --</option>
                 <option value="floor-tiles">Floor Tiles</option>
                 <option value="wall-tiles">Wall Tiles</option>
-                <option value="stone">Stone / Marble / Granite</option>
+                <option value="stone">Stone / Marble</option>
                 <option value="modular-kitchen">Modular Kitchen</option>
                 <option value="pillar">Pillar Design</option>
-                <option value="step-riser">Step Riser / Seedhiyan</option>
-                <option value="elevation">Elevation & Cladding</option>
+                <option value="step-riser">Step Riser</option>
+                <option value="elevation">Elevation</option>
                 <option value="others">Others</option>
             </select>
 
-            <button onclick="uploadPhotos()" style="background:#25D366; color:white; padding:14px 35px; border:none; border-radius:30px; font-weight:600; margin-top:10px;">
-                Upload to Gallery
+            <button onclick="uploadPhotos()" style="background:#25D366; color:white; padding:14px 40px; border:none; border-radius:30px; font-weight:600;">
+                Upload Karo
             </button>
-            <div id="progressBar" style="display:none; height:8px; background:#333; margin-top:15px; border-radius:10px; overflow:hidden;">
-                <div id="progressFill" style="height:100%; width:0%; background:var(--accent-color); transition:0.4s;"></div>
-            </div>
-            <div id="uploadStatus" style="margin-top:12px; min-height:25px;"></div>
+            <div id="uploadStatus" style="margin-top:15px; font-weight:600; min-height:30px;"></div>
         </div>
     </section>
 
-    <section class="gallery">
+    <!-- Gallery -->
+    <section>
         <h2>Our <span>Gallery</span></h2>
         <div class="category-filters" id="filters"></div>
         <div id="loader">Loading photos...</div>
         <div class="gallery-grid" id="galleryGrid"></div>
     </section>
 
-    <!-- Admin Panel -->
-    <section class="admin-section" style="background:rgba(239,68,68,0.1); padding:50px 8%;">
+    <!-- Admin -->
+    <section style="background:rgba(239,68,68,0.1); padding:40px 8%;">
         <h3>🔒 Admin Panel</h3>
-        <input type="password" id="adminPass" placeholder="Admin Password" style="padding:12px; width:280px; border-radius:8px;">
-        <button onclick="adminLogin()" style="padding:12px 25px; background:var(--danger); border:none; border-radius:8px; color:white;">Login</button>
+        <input type="password" id="adminPass" placeholder="Password" style="padding:12px; width:280px;">
+        <button onclick="adminLogin()" style="padding:12px 25px; background:#ef4444; color:white; border:none; border-radius:8px;">Login</button>
     </section>
 
-    <div class="sticky-cta">
-        <a href="tel:+919627535352" style="background:#25D366;">📞</a>
-        <a href="https://wa.me/919627535352" target="_blank" style="background:#128C7E;">💬</a>
+    <div style="position:fixed; bottom:20px; right:20px; display:flex; gap:15px; z-index:999;">
+        <a href="tel:+919627535352" style="background:#25D366; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; text-decoration:none;">📞</a>
+        <a href="https://wa.me/919627535352" target="_blank" style="background:#128C7E; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; text-decoration:none;">💬</a>
     </div>
 
     <script type="module">
@@ -144,36 +146,44 @@
         let isAdmin = false;
         let allPhotos = [];
 
-        // Filter Buttons
-        const catList = ["all","floor-tiles","wall-tiles","stone","modular-kitchen","pillar","step-riser","elevation"];
-        const names = {all:"All", "floor-tiles":"Floor Tiles", "wall-tiles":"Wall Tiles", stone:"Stone Work", 
-                      "modular-kitchen":"Modular Kitchen", pillar:"Pillar", "step-riser":"Step Riser", elevation:"Elevation"};
+        const categories = [
+            {val:"all", name:"All"},
+            {val:"floor-tiles", name:"Floor Tiles"},
+            {val:"wall-tiles", name:"Wall Tiles"},
+            {val:"stone", name:"Stone Work"},
+            {val:"modular-kitchen", name:"Modular Kitchen"},
+            {val:"pillar", name:"Pillar"},
+            {val:"step-riser", name:"Step Riser"},
+            {val:"elevation", name:"Elevation"}
+        ];
 
-        catList.forEach(c => {
+        // Create Filter Buttons
+        categories.forEach(cat => {
             const btn = document.createElement('button');
-            btn.className = `filter-btn ${c==='all' ? 'active' : ''}`;
-            btn.textContent = names[c];
-            btn.dataset.category = c;
-            btn.onclick = () => filterGallery(c);
+            btn.className = `filter-btn ${cat.val === 'all' ? 'active' : ''}`;
+            btn.textContent = cat.name;
+            btn.dataset.category = cat.val;
+            btn.onclick = () => filterGallery(cat.val);
             document.getElementById('filters').appendChild(btn);
         });
 
-        window.uploadPhotos = async function() {
-            // ... (same upload function as before)
+        async function uploadPhotos() {
             const files = document.getElementById('photoInput').files;
             const category = document.getElementById('categorySelect').value;
-            if (!files.length || !category) return alert("Photo aur Category dono select करें");
 
-            // Upload logic same as previous working version
-            const uploadBtn = document.querySelector('button[onclick="uploadPhotos()"]');
-            uploadBtn.disabled = true;
-            document.getElementById('progressBar').style.display = 'block';
+            if (files.length === 0) return alert("Photo select करें");
+            if (!category) return alert("Category select करें");
+
+            const status = document.getElementById('uploadStatus');
+            status.textContent = "Uploading...";
 
             for (let file of files) {
                 const formData = new FormData();
                 formData.append("image", file);
                 try {
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {method:"POST", body:formData});
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: "POST", body: formData
+                    });
                     const data = await res.json();
                     if (data.success) {
                         await addDoc(collection(db, "gallery"), {
@@ -183,13 +193,13 @@
                             timestamp: serverTimestamp()
                         });
                     }
-                } catch(e){}
+                } catch(e) { console.error(e); }
             }
-            document.getElementById('uploadStatus').innerHTML = `✅ ${files.length} Photos Successfully Uploaded!`;
+
+            status.innerHTML = `✅ ${files.length} Photos Upload Ho Gayi!`;
             document.getElementById('photoInput').value = '';
             document.getElementById('categorySelect').value = '';
-            uploadBtn.disabled = false;
-        };
+        }
 
         function filterGallery(cat) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -202,52 +212,61 @@
         function renderGallery(photos) {
             const grid = document.getElementById('galleryGrid');
             grid.innerHTML = '';
+
+            if (photos.length === 0) {
+                grid.innerHTML = `<p class="no-photos">Abhi is category mein koi photo nahi hai.<br>Photo upload karein.</p>`;
+                return;
+            }
+
             photos.forEach(photo => {
                 const div = document.createElement('div');
                 div.className = 'photo-box';
                 div.innerHTML = `
-                    <img src="\( {photo.url}" loading="lazy" onclick="openLightbox(' \){photo.url}')">
+                    <img src="\( {photo.url}" loading="lazy" alt=" \){photo.name}">
                     <button class="delete-btn" onclick="deletePhoto('${photo.id}')">×</button>
-                    <div class="photo-caption">${names[photo.category] || 'Work'}</div>
+                    <div class="photo-caption">${photo.name.substring(0,30)}</div>
                 `;
+                // Click on image to enlarge
+                div.querySelector('img').addEventListener('click', () => openLightbox(photo.url));
                 grid.appendChild(div);
             });
         }
 
         function openLightbox(url) {
             const lb = document.createElement('div');
-            lb.style = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.97); z-index:10000; display:flex; align-items:center; justify-content:center;`;
-            lb.innerHTML = `<img src="${url}" style="max-height:95vh; max-width:95vw; border-radius:12px;"> 
-                            <button onclick="this.parentElement.remove()" style="position:absolute; top:20px; right:20px; font-size:40px; color:white; background:none; border:none;">×</button>`;
+            lb.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:10000;display:flex;align-items:center;justify-content:center;`;
+            lb.innerHTML = `
+                <img src="${url}" style="max-width:95%; max-height:95vh; border-radius:12px;">
+                <button onclick="this.parentElement.remove()" style="position:absolute;top:20px;right:20px;font-size:40px;color:white;background:none;border:none;">×</button>
+            `;
             document.body.appendChild(lb);
         }
 
-        onSnapshot(collection(db, "gallery"), (snap) => {
+        // Real-time listener
+        onSnapshot(collection(db, "gallery"), (snapshot) => {
             document.getElementById('loader').style.display = 'none';
-            allPhotos = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            allPhotos = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                                  .sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
             renderGallery(allPhotos);
         });
 
         window.adminLogin = function() {
-            const pass = document.getElementById('adminPass').value;
-            if (btoa(pass) === "YWFzaHVAMjAyNg==") {
+            if (btoa(document.getElementById('adminPass').value) === "YWFzaHVAMjAyNg==") {
                 isAdmin = true;
                 document.body.classList.add('admin-mode');
-                alert("✅ Admin Mode Activated - Delete buttons visible");
-            } else {
-                alert("❌ Wrong Password");
-            }
+                alert("Admin Mode On - Delete buttons dikhege");
+            } else alert("Galat Password");
         };
 
         window.deletePhoto = async function(id) {
             if (!isAdmin) return;
-            if (confirm("Photo delete karna hai?")) {
+            if (confirm("Photo delete karni hai?")) {
                 await deleteDoc(doc(db, "gallery", id));
             }
         };
 
         function toggleMenu() {
-            alert("Menu Option jaldi aa raha hai");
+            alert("Menu jaldi aa raha hai");
         }
     </script>
 </body>
