@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | Aashu Tiles Work</title>
+  <meta name="description" content="Real tiles work gallery for Aashu Tiles Work." />
+  <style>
+    body{font-family:Arial;background:#0f172a;color:#e5e7eb;margin:0;padding:20px}
+    .wrap{max-width:1180px;margin:auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    figure{margin:0;background:#111827;border:1px solid #243041;border-radius:18px;overflow:hidden}
+    img{width:100%;height:220px;object-fit:cover;display:block}
+    figcaption{padding:12px;color:#cbd5e1}
+    .upload{background:#111827;border:1px solid #243041;border-radius:18px;padding:18px;margin-bottom:18px}
+    input[type=file]{color:#cbd5e1}
+    a{color:#fbbf24;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 style="color:#fbbf24">Gallery</h1>
 
+    <div class="upload">
+      <h3>Upload Your Photos</h3>
+      <input type="file" id="photoInput" accept="image/*" multiple />
+      <p style="color:#94a3b8">Ye preview ke liye hai. Actual upload ke liye Cloudflare Function use hoga.</p>
+    </div>
+
+    <div class="grid" id="galleryGrid">
+      <figure>
+        <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/94fb97c71a3db99a2e0e7ec6470837fe143911fd.jpg" alt="Floor tiles work">
+        <figcaption>Floor tile installation.</figcaption>
+      </figure>
+      <figure>
+        <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/ebee270d891670f2b27a105032919284e9eb8f1c.jpg" alt="Wall tiles work">
+        <figcaption>Wall tile fixing.</figcaption>
+      </figure>
+      <figure>
+        <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/5c3a1c9a857d43fc8ddb13a03636d7601390c581.jpg" alt="Mason work">
+        <figcaption>Mason tile work.</figcaption>
+      </figure>
+      <figure>
+        <img src="https://pplx-res.cloudinary.com/image/upload/pplx_search_images/784b206b03f8af7dea6b1442ca77a2efaa635a14.jpg" alt="Home tiling">
+        <figcaption>Home flooring project.</figcaption>
+      </figure>
+    </div>
+
+    <p style="margin-top:18px"><a href="index.html">Back to Home</a></p>
+  </div>
+
+  <script>
+    const input = document.getElementById('photoInput');
+    const grid = document.getElementById('galleryGrid');
+    input?.addEventListener('change', () => {
+      [...input.files].forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const fig = document.createElement('figure');
+          fig.innerHTML = `<img src="${e.target.result}" alt="Uploaded photo"><figcaption>Uploaded photo</figcaption>`;
+          grid.prepend(fig);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  </script>
+</body>
+</html>
